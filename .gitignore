@@ -1,0 +1,15 @@
+*
+!.gitignore
+!*.nix
+!.shellhook
+!shell
+!.clang-format
+!assets/
+!*.png
+!scripts/
+!*.sh
+!*.py
+!src/
+!*.hpp
+!*.cpp
+!*.glsl

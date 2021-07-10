@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+export WD=$PWD
+
+if [ ! -d "$WD/bin" ]; then
+    mkdir "$WD/bin"
+fi
+
+set -e
+
+expression=$(grep "export" < nixGL/result/bin/nixGL*)
+if [ -n "$expression" ]; then
+    eval "$expression"
+fi
+
+export LD_LIBRARY_PATH="$WD/glfw/src:$LD_LIBRARY_PATH"
+
+set +e
