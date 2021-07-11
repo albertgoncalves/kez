@@ -9,6 +9,8 @@
 !scripts/
 !*.sh
 !*.py
+!stb/
+!*.h
 !src/
 !*.hpp
 !*.cpp
