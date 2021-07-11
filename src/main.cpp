@@ -6,15 +6,38 @@
 
 struct Object {
     u32 vertex_array;
+    u32 vertex_buffer;
     u32 texture;
 };
 
 struct Uniform {
     i32 resolution;
     i32 time;
+    i32 pixels;
+    i32 cells;
+};
+
+struct PageIndex {
+    u32 x;
+    u32 y;
 };
 
 static Object OBJECT;
+
+static const PageIndex page_indices[] = {
+    {0, 0},
+    {1, 0},
+    {2, 0},
+    {3, 0},
+    {0, 1},
+    {1, 1},
+    {2, 1},
+    {3, 1},
+    {0, 2},
+    {1, 2},
+    {2, 2},
+    {3, 2},
+};
 
 #define MICROSECONDS 1000000.0f
 
@@ -72,6 +95,22 @@ i32 main() {
             glBindVertexArray(OBJECT.vertex_array);
         }
         {
+            glGenBuffers(1, &OBJECT.vertex_buffer);
+            glBindBuffer(GL_ARRAY_BUFFER, OBJECT.vertex_buffer);
+            glBufferData(GL_ARRAY_BUFFER,
+                         sizeof(page_indices),
+                         page_indices,
+                         GL_DYNAMIC_DRAW);
+            glEnableVertexAttribArray(0);
+            glVertexAttribIPointer(0,
+                                   2,
+                                   GL_UNSIGNED_INT,
+                                   sizeof(page_indices[0]),
+                                   null);
+            glVertexAttribDivisor(0, 1);
+            CHECK_GL_ERROR();
+        }
+        {
             glActiveTexture(GL_TEXTURE0);
             glGenTextures(1, &OBJECT.texture);
             glBindTexture(GL_TEXTURE_2D, OBJECT.texture);
@@ -101,7 +140,12 @@ i32 main() {
         const Uniform uniform = {
             glGetUniformLocation(program, "RESOLUTION"),
             glGetUniformLocation(program, "TIME"),
+            glGetUniformLocation(program, "PIXELS"),
+            glGetUniformLocation(program, "CELLS"),
         };
+        glUniform2ui(uniform.pixels, PIXEL_WIDTH, PIXEL_HEIGHT);
+        // NOTE: Is there any way to avoid hard-coding this information?
+        glUniform2ui(uniform.cells, 18, 7);
         CHECK_GL_ERROR();
         while (!glfwWindowShouldClose(window)) {
             const f32 time = static_cast<f32>(glfwGetTime());
@@ -118,7 +162,11 @@ i32 main() {
                             static_cast<f32>(WINDOW_HEIGHT));
                 glUniform1f(uniform.time, time);
                 glClear(GL_COLOR_BUFFER_BIT);
-                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                glDrawArraysInstanced(GL_TRIANGLE_STRIP,
+                                      0,
+                                      4,
+                                      sizeof(page_indices) /
+                                          sizeof(page_indices[0]));
                 CHECK_GL_ERROR();
             }
             glfwSwapBuffers(window);
@@ -134,6 +182,7 @@ i32 main() {
     {
         glDeleteProgram(program);
         glDeleteVertexArrays(1, &OBJECT.vertex_array);
+        glDeleteBuffers(1, &OBJECT.vertex_buffer);
         glDeleteTextures(1, &OBJECT.texture);
         CHECK_GL_ERROR();
     }
