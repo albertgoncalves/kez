@@ -17,26 +17,31 @@ struct Uniform {
     i32 cells;
 };
 
-struct PageIndex {
+struct Position {
     u32 x;
     u32 y;
 };
 
+struct Glyph {
+    Position position;
+    u32      char_;
+};
+
 static Object OBJECT;
 
-static const PageIndex page_indices[] = {
-    {0, 0},
-    {1, 0},
-    {2, 0},
-    {3, 0},
-    {0, 1},
-    {1, 1},
-    {2, 1},
-    {3, 1},
-    {0, 2},
-    {1, 2},
-    {2, 2},
-    {3, 2},
+static const Glyph glyphs[] = {
+    {{0, 0}, '0'},
+    {{1, 0}, '1'},
+    {{2, 0}, '2'},
+    {{3, 0}, '3'},
+    {{0, 1}, '4'},
+    {{1, 1}, '5'},
+    {{2, 1}, '6'},
+    {{3, 1}, '7'},
+    {{0, 2}, '8'},
+    {{1, 2}, '9'},
+    {{2, 2}, 'a'},
+    {{3, 2}, 'b'},
 };
 
 #define MICROSECONDS 1000000.0f
@@ -98,16 +103,29 @@ i32 main() {
             glGenBuffers(1, &OBJECT.vertex_buffer);
             glBindBuffer(GL_ARRAY_BUFFER, OBJECT.vertex_buffer);
             glBufferData(GL_ARRAY_BUFFER,
-                         sizeof(page_indices),
-                         page_indices,
+                         sizeof(glyphs),
+                         glyphs,
                          GL_DYNAMIC_DRAW);
-            glEnableVertexAttribArray(0);
-            glVertexAttribIPointer(0,
-                                   2,
-                                   GL_UNSIGNED_INT,
-                                   sizeof(page_indices[0]),
-                                   null);
-            glVertexAttribDivisor(0, 1);
+            {
+                glEnableVertexAttribArray(0);
+                glVertexAttribIPointer(
+                    0,
+                    2,
+                    GL_UNSIGNED_INT,
+                    sizeof(glyphs[0]),
+                    reinterpret_cast<void*>(offsetof(Glyph, position)));
+                glVertexAttribDivisor(0, 1);
+            }
+            {
+                glEnableVertexAttribArray(1);
+                glVertexAttribIPointer(
+                    1,
+                    1,
+                    GL_UNSIGNED_INT,
+                    sizeof(glyphs[0]),
+                    reinterpret_cast<void*>(offsetof(Glyph, char_)));
+                glVertexAttribDivisor(1, 1);
+            }
             CHECK_GL_ERROR();
         }
         {
@@ -165,8 +183,7 @@ i32 main() {
                 glDrawArraysInstanced(GL_TRIANGLE_STRIP,
                                       0,
                                       4,
-                                      sizeof(page_indices) /
-                                          sizeof(page_indices[0]));
+                                      sizeof(glyphs) / sizeof(glyphs[0]));
                 CHECK_GL_ERROR();
             }
             glfwSwapBuffers(window);

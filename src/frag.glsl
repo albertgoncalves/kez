@@ -2,7 +2,8 @@
 
 precision mediump float;
 
-in vec2 VERT_OUT_POSITION;
+in vec2      VERT_OUT_POSITION;
+flat in uint VERT_OUT_CHAR;
 
 uniform float TIME;
 uniform vec2  RESOLUTION;
@@ -16,7 +17,8 @@ uniform sampler2D TEXTURE;
 layout(location = 0) out vec4 FRAG_OUT_COLOR;
 
 void main() {
-    vec2 index = uvec2(1, 1) / vec2(PIXELS);
+    uint char = VERT_OUT_CHAR - 32u;
+    vec2 index = uvec2(char % CELLS.x, char / CELLS.x) / vec2(PIXELS);
     vec2 coord = vec2(VERT_OUT_POSITION.x, VERT_OUT_POSITION.y);
     vec3 color = vec3(gl_FragCoord.xy / RESOLUTION, 0.5);
     color *= (sin(TIME * 0.1) + 1.0) / 2.0;
