@@ -1,10 +1,10 @@
 #ifndef __ASSETS_CODEGEN_H__
 #define __ASSETS_CODEGEN_H__
 #include "prelude.hpp"
-#define WIDTH    128
-#define HEIGHT   64
-#define CHANNELS 4
-static const u8 PIXELS[WIDTH * HEIGHT * CHANNELS] = {
+#define PIXEL_WIDTH    128
+#define PIXEL_HEIGHT   64
+#define PIXEL_CHANNELS 4
+static const u8 PIXEL_DATA[PIXEL_WIDTH * PIXEL_HEIGHT * PIXEL_CHANNELS] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,

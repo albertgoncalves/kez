@@ -46,10 +46,11 @@ i32 main(i32 n, const char** args) {
            "#define __ASSETS_CODEGEN_H__\n"
            "#include \"prelude.hpp\"\n");
     {
-        printf("#define WIDTH %d\n"
-               "#define HEIGHT %d\n"
-               "#define CHANNELS %d\n"
-               "static const u8 PIXELS[WIDTH * HEIGHT * CHANNELS] = {",
+        printf("#define PIXEL_WIDTH %d\n"
+               "#define PIXEL_HEIGHT %d\n"
+               "#define PIXEL_CHANNELS %d\n"
+               "static const u8 PIXEL_DATA"
+               "[PIXEL_WIDTH * PIXEL_HEIGHT * PIXEL_CHANNELS] = {",
                width,
                height,
                channels);

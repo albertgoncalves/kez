@@ -86,12 +86,12 @@ i32 main() {
             glTexImage2D(GL_TEXTURE_2D,
                          0,
                          GL_RGBA,
-                         WIDTH,
-                         HEIGHT,
+                         PIXEL_WIDTH,
+                         PIXEL_HEIGHT,
                          0,
                          GL_RGBA,
                          GL_UNSIGNED_BYTE,
-                         PIXELS);
+                         PIXEL_DATA);
             CHECK_GL_ERROR();
         }
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
