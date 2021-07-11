@@ -99,8 +99,8 @@ i32 main() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glUseProgram(program);
         const Uniform uniform = {
-            glGetUniformLocation(program, "U_RESOLUTION"),
-            glGetUniformLocation(program, "U_TIME"),
+            glGetUniformLocation(program, "RESOLUTION"),
+            glGetUniformLocation(program, "TIME"),
         };
         CHECK_GL_ERROR();
         while (!glfwWindowShouldClose(window)) {
