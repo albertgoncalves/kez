@@ -16,3 +16,5 @@ fi
 export LD_LIBRARY_PATH="$WD/glfw/src:$LD_LIBRARY_PATH"
 
 set +e
+
+alias feh="feh --force-aliasing"
