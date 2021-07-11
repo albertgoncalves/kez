@@ -2,6 +2,8 @@
 #include "init_assets_codegen.hpp"
 #include "scene_assets_codegen.hpp"
 
+#include <unistd.h>
+
 struct Object {
     u32 vertex_array;
     u32 texture;
@@ -9,20 +11,14 @@ struct Object {
 
 struct Uniform {
     i32 resolution;
+    i32 time;
 };
 
 static Object OBJECT;
 
-#pragma GCC diagnostic push
+#define MICROSECONDS 1000000.0f
 
-#pragma GCC diagnostic ignored "-Wmissing-noreturn"
-
-static void error_callback(i32 code, const char* error) {
-    fprintf(stderr, "%d: %s\n", code, error);
-    exit(EXIT_FAILURE);
-}
-
-#pragma GCC diagnostic pop
+#define FRAME_DURATION ((1.0f / 60.0f) * MICROSECONDS)
 
 #define CHECK_GL_ERROR()                               \
     {                                                  \
@@ -47,6 +43,17 @@ static void error_callback(i32 code, const char* error) {
         }                                              \
         }                                              \
     }
+
+#pragma GCC diagnostic push
+
+#pragma GCC diagnostic ignored "-Wmissing-noreturn"
+
+static void error_callback(i32 code, const char* error) {
+    fprintf(stderr, "%d: %s\n", code, error);
+    exit(EXIT_FAILURE);
+}
+
+#pragma GCC diagnostic pop
 
 i32 main() {
     Memory* memory = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
@@ -87,30 +94,41 @@ i32 main() {
                          PIXELS);
             CHECK_GL_ERROR();
         }
-        glClearColor(0.325f, 0.475f, 0.75f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glUseProgram(program);
         const Uniform uniform = {
             glGetUniformLocation(program, "U_RESOLUTION"),
+            glGetUniformLocation(program, "U_TIME"),
         };
         CHECK_GL_ERROR();
         while (!glfwWindowShouldClose(window)) {
-            glfwWaitEvents();
-            if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-                glfwSetWindowShouldClose(window, true);
+            const f32 time = static_cast<f32>(glfwGetTime());
+            {
+                glfwPollEvents();
+                if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+                    glfwSetWindowShouldClose(window, true);
+                }
             }
             {
                 glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
                 glUniform2f(uniform.resolution,
                             static_cast<f32>(WINDOW_WIDTH),
                             static_cast<f32>(WINDOW_HEIGHT));
+                glUniform1f(uniform.time, time);
                 glClear(GL_COLOR_BUFFER_BIT);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                 CHECK_GL_ERROR();
             }
             glfwSwapBuffers(window);
-            printf("!\n");
+            {
+                const f32 now = static_cast<f32>(glfwGetTime());
+                const f32 elapsed = (now - time) * MICROSECONDS;
+                if (elapsed < FRAME_DURATION) {
+                    usleep(static_cast<u32>(FRAME_DURATION - elapsed));
+                }
+            }
         }
     }
     {
