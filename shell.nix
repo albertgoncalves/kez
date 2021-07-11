@@ -9,6 +9,12 @@ mkShell.override { stdenv = llvmPackages_12.stdenv; } {
         python3
         python3Packages.flake8
         shellcheck
+        xorg.libX11
+        xorg.libXcursor
+        xorg.libXext
+        xorg.libXi
+        xorg.libXinerama
+        xorg.libXrandr
     ];
     shellHook = ''
         . .shellhook
