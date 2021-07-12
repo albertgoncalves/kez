@@ -14,12 +14,12 @@
 
 #pragma GCC diagnostic pop
 
-struct Memory {
+struct BufferMemory {
     char buffer[2 << 9];
 };
 
-#define INIT_WINDOW_WIDTH  1024
-#define INIT_WINDOW_HEIGHT 768
+#define INIT_WINDOW_WIDTH  ((1 << 10) + (1 << 9))
+#define INIT_WINDOW_HEIGHT ((1 << 8) + (1 << 6))
 
 static i32 WINDOW_WIDTH = INIT_WINDOW_WIDTH;
 static i32 WINDOW_HEIGHT = INIT_WINDOW_HEIGHT;
@@ -53,7 +53,9 @@ static GLFWwindow* init_get_window(const char* name) {
     return window;
 }
 
-static u32 init_get_shader(Memory* memory, const char* source, u32 type) {
+static u32 init_get_shader(BufferMemory* memory,
+                           const char*   source,
+                           u32           type) {
     const u32 shader = glCreateShader(type);
     glShaderSource(shader, 1, &source, null);
     glCompileShader(shader);
@@ -69,9 +71,9 @@ static u32 init_get_shader(Memory* memory, const char* source, u32 type) {
     return shader;
 }
 
-static u32 init_get_program(Memory* memory,
-                            u32     vertex_shader,
-                            u32     fragment_shader) {
+static u32 init_get_program(BufferMemory* memory,
+                            u32           vertex_shader,
+                            u32           fragment_shader) {
     const u32 program = glCreateProgram();
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);

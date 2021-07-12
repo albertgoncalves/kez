@@ -10,6 +10,7 @@ mkShell.override { stdenv = llvmPackages_12.stdenv; } {
         python3Packages.flake8
         renderdoc
         shellcheck
+        valgrind
         xorg.libX11
         xorg.libXcursor
         xorg.libXext

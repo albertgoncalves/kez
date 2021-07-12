@@ -4,6 +4,8 @@
 
 #include <unistd.h>
 
+#define CAP_GLYPHS 20
+
 struct Object {
     u32 vertex_array;
     u32 vertex_buffer;
@@ -27,22 +29,17 @@ struct Glyph {
     u32      char_;
 };
 
-static Object OBJECT;
-
-static const Glyph glyphs[] = {
-    {{0, 0}, '0'},
-    {{1, 0}, '1'},
-    {{2, 0}, '2'},
-    {{3, 0}, '3'},
-    {{0, 1}, '4'},
-    {{1, 1}, '5'},
-    {{2, 1}, '6'},
-    {{3, 1}, '7'},
-    {{0, 2}, '8'},
-    {{1, 2}, '9'},
-    {{2, 2}, 'a'},
-    {{3, 2}, 'b'},
+struct GlyphMemory {
+    char  chars[CAP_GLYPHS];
+    Glyph glyphs[CAP_GLYPHS];
 };
+
+struct Arena {
+    BufferMemory buffer_memory;
+    GlyphMemory  glyph_memory;
+};
+
+static Object OBJECT;
 
 #define MICROSECONDS 1000000.0f
 
@@ -83,17 +80,50 @@ static void error_callback(i32 code, const char* error) {
 
 #pragma GCC diagnostic pop
 
+static void set_glyphs(GlyphMemory* memory) {
+    {
+        Epoch epoch;
+        time(&epoch);
+        Time* time = localtime(&epoch);
+        snprintf(memory->chars,
+                 CAP_GLYPHS,
+                 "%4d-%02d-%02d %02d:%02d:%02d",
+                 1900 + time->tm_year,
+                 time->tm_mon,
+                 time->tm_mday,
+                 time->tm_hour,
+                 time->tm_min,
+                 time->tm_sec);
+    }
+    {
+        for (u32 i = 0; i < CAP_GLYPHS; ++i) {
+            Glyph* glyph = &memory->glyphs[i];
+            glyph->char_ = static_cast<u32>(memory->chars[i]);
+            glyph->position.x = i + 1;
+            glyph->position.y = 1;
+        }
+    }
+}
+
 i32 main() {
-    Memory* memory = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
-    EXIT_IF(!memory);
-    printf("GLFW version : %s\n\n", glfwGetVersionString());
+    printf("GLFW version  : %s\n"
+           "sizeof(Glyph) : %zu\n"
+           "sizeof(Arena) : %zu\n"
+           "\n",
+           glfwGetVersionString(),
+           sizeof(Glyph),
+           sizeof(Arena));
+    Arena* arena = reinterpret_cast<Arena*>(calloc(1, sizeof(Arena)));
+    EXIT_IF(!arena);
     glfwSetErrorCallback(error_callback);
     EXIT_IF(!glfwInit());
     GLFWwindow* window = init_get_window("float");
     const u32   program = init_get_program(
-        memory,
-        init_get_shader(memory, SHADER_VERT, GL_VERTEX_SHADER),
-        init_get_shader(memory, SHADER_FRAG, GL_FRAGMENT_SHADER));
+        &arena->buffer_memory,
+        init_get_shader(&arena->buffer_memory, SHADER_VERT, GL_VERTEX_SHADER),
+        init_get_shader(&arena->buffer_memory,
+                        SHADER_FRAG,
+                        GL_FRAGMENT_SHADER));
     {
         {
             glGenVertexArrays(1, &OBJECT.vertex_array);
@@ -103,8 +133,8 @@ i32 main() {
             glGenBuffers(1, &OBJECT.vertex_buffer);
             glBindBuffer(GL_ARRAY_BUFFER, OBJECT.vertex_buffer);
             glBufferData(GL_ARRAY_BUFFER,
-                         sizeof(glyphs),
-                         glyphs,
+                         sizeof(arena->glyph_memory.glyphs),
+                         &arena->glyph_memory.glyphs[0],
                          GL_DYNAMIC_DRAW);
             {
                 glEnableVertexAttribArray(0);
@@ -112,7 +142,7 @@ i32 main() {
                     0,
                     2,
                     GL_UNSIGNED_INT,
-                    sizeof(glyphs[0]),
+                    sizeof(Glyph),
                     reinterpret_cast<void*>(offsetof(Glyph, position)));
                 glVertexAttribDivisor(0, 1);
             }
@@ -122,7 +152,7 @@ i32 main() {
                     1,
                     1,
                     GL_UNSIGNED_INT,
-                    sizeof(glyphs[0]),
+                    sizeof(Glyph),
                     reinterpret_cast<void*>(offsetof(Glyph, char_)));
                 glVertexAttribDivisor(1, 1);
             }
@@ -174,16 +204,20 @@ i32 main() {
                 }
             }
             {
+                set_glyphs(&arena->glyph_memory);
+                glBufferSubData(GL_ARRAY_BUFFER,
+                                0,
+                                sizeof(arena->glyph_memory.glyphs),
+                                &arena->glyph_memory.glyphs[0]);
+            }
+            {
                 glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
                 glUniform2f(uniform.resolution,
                             static_cast<f32>(WINDOW_WIDTH),
                             static_cast<f32>(WINDOW_HEIGHT));
                 glUniform1f(uniform.time, time);
                 glClear(GL_COLOR_BUFFER_BIT);
-                glDrawArraysInstanced(GL_TRIANGLE_STRIP,
-                                      0,
-                                      4,
-                                      sizeof(glyphs) / sizeof(glyphs[0]));
+                glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, CAP_GLYPHS);
                 CHECK_GL_ERROR();
             }
             glfwSwapBuffers(window);
@@ -204,7 +238,6 @@ i32 main() {
         CHECK_GL_ERROR();
     }
     glfwTerminate();
-    free(memory);
-    printf("Done!\n");
+    free(arena);
     return EXIT_SUCCESS;
 }
