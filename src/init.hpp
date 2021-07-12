@@ -24,10 +24,10 @@ struct BufferMemory {
 static i32 WINDOW_WIDTH = INIT_WINDOW_WIDTH;
 static i32 WINDOW_HEIGHT = INIT_WINDOW_HEIGHT;
 
-static void init_framebuffer_size_callback(GLFWwindow* _,
+static void init_framebuffer_size_callback(GLFWwindow* window,
                                            i32         width,
                                            i32         height) {
-    (void)_;
+    (void)window;
     WINDOW_WIDTH = width;
     WINDOW_HEIGHT = height;
 }
