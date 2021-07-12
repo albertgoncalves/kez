@@ -237,11 +237,12 @@ i32 main() {
                 glClear(GL_COLOR_BUFFER_BIT);
                 glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, CAP_GLYPHS);
                 CHECK_GL_ERROR();
+                glfwSwapBuffers(window);
             }
-            glfwSwapBuffers(window);
             {
                 const f32 elapsed =
-                    (static_cast<f32>(glfwGetTime()) - time_) * MICROSECONDS;
+                    (static_cast<f32>(glfwGetTime()) * MICROSECONDS) -
+                    (time_ * MICROSECONDS);
                 if (elapsed < FRAME_DURATION) {
                     usleep(static_cast<u32>(FRAME_DURATION - elapsed));
                 }
