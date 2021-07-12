@@ -4,7 +4,8 @@
 
 #include <unistd.h>
 
-#define CAP_GLYPHS 20
+#define CAP_CHARS  20
+#define CAP_GLYPHS (CAP_CHARS - 1)
 
 struct Object {
     u32 vertex_array;
@@ -30,7 +31,7 @@ struct Glyph {
 };
 
 struct GlyphMemory {
-    char  chars[CAP_GLYPHS];
+    char  chars[CAP_CHARS];
     Glyph glyphs[CAP_GLYPHS];
 };
 
@@ -40,6 +41,8 @@ struct Arena {
 };
 
 static Object OBJECT;
+
+static u32 CURSOR;
 
 #define MICROSECONDS 1000000.0f
 
@@ -79,31 +82,6 @@ static void error_callback(i32 code, const char* error) {
 }
 
 #pragma GCC diagnostic pop
-
-static void set_glyphs(GlyphMemory* memory) {
-    {
-        Epoch epoch;
-        time(&epoch);
-        Time* time = localtime(&epoch);
-        snprintf(memory->chars,
-                 CAP_GLYPHS,
-                 "%4d-%02d-%02d %02d:%02d:%02d",
-                 1900 + time->tm_year,
-                 time->tm_mon,
-                 time->tm_mday,
-                 time->tm_hour,
-                 time->tm_min,
-                 time->tm_sec);
-    }
-    {
-        for (u32 i = 0; i < CAP_GLYPHS; ++i) {
-            Glyph* glyph = &memory->glyphs[i];
-            glyph->char_ = static_cast<u32>(memory->chars[i]);
-            glyph->position.x = i + 1;
-            glyph->position.y = 1;
-        }
-    }
-}
 
 i32 main() {
     printf("GLFW version  : %s\n"
@@ -196,15 +174,46 @@ i32 main() {
         glUniform2ui(uniform.cells, 18, 7);
         CHECK_GL_ERROR();
         while (!glfwWindowShouldClose(window)) {
-            const f32 time = static_cast<f32>(glfwGetTime());
+            const f32 time_ = static_cast<f32>(glfwGetTime());
             {
                 glfwPollEvents();
                 if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
                     glfwSetWindowShouldClose(window, true);
                 }
+                if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+                    if (0 < CURSOR) {
+                        --CURSOR;
+                    }
+                }
+                if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                    if (CURSOR < (CAP_GLYPHS - 1)) {
+                        ++CURSOR;
+                    }
+                }
             }
             {
-                set_glyphs(&arena->glyph_memory);
+                {
+                    Epoch epoch;
+                    time(&epoch);
+                    Time* t = localtime(&epoch);
+                    snprintf(arena->glyph_memory.chars,
+                             CAP_CHARS,
+                             "%4d-%02d-%02d %02d:%02d:%02d",
+                             1900 + t->tm_year,
+                             t->tm_mon,
+                             t->tm_mday,
+                             t->tm_hour,
+                             t->tm_min,
+                             t->tm_sec);
+                    for (u32 i = 0; i < CAP_GLYPHS; ++i) {
+                        Glyph* glyph = &arena->glyph_memory.glyphs[i];
+                        glyph->char_ =
+                            static_cast<u32>(arena->glyph_memory.chars[i]);
+                        glyph->position.x = i + 1;
+                        glyph->position.y = 1;
+                    }
+                    arena->glyph_memory.glyphs[CURSOR].char_ |= 0x100;
+                }
                 glBufferSubData(GL_ARRAY_BUFFER,
                                 0,
                                 sizeof(arena->glyph_memory.glyphs),
@@ -215,15 +224,15 @@ i32 main() {
                 glUniform2f(uniform.resolution,
                             static_cast<f32>(WINDOW_WIDTH),
                             static_cast<f32>(WINDOW_HEIGHT));
-                glUniform1f(uniform.time, time);
+                glUniform1f(uniform.time, time_);
                 glClear(GL_COLOR_BUFFER_BIT);
                 glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, CAP_GLYPHS);
                 CHECK_GL_ERROR();
             }
             glfwSwapBuffers(window);
             {
-                const f32 now = static_cast<f32>(glfwGetTime());
-                const f32 elapsed = (now - time) * MICROSECONDS;
+                const f32 elapsed =
+                    (static_cast<f32>(glfwGetTime()) - time_) * MICROSECONDS;
                 if (elapsed < FRAME_DURATION) {
                     usleep(static_cast<u32>(FRAME_DURATION - elapsed));
                 }
