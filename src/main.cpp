@@ -195,22 +195,21 @@ i32 main() {
                 {
                     Epoch epoch;
                     time(&epoch);
-                    Time* t = localtime(&epoch);
+                    const Time* local_time = localtime(&epoch);
                     snprintf(arena->glyph_memory.chars,
                              CAP_CHARS,
                              "%4d-%02d-%02d %02d:%02d:%02d",
-                             1900 + t->tm_year,
-                             t->tm_mon,
-                             t->tm_mday,
-                             t->tm_hour,
-                             t->tm_min,
-                             t->tm_sec);
+                             1900 + local_time->tm_year,
+                             local_time->tm_mon,
+                             local_time->tm_mday,
+                             local_time->tm_hour,
+                             local_time->tm_min,
+                             local_time->tm_sec);
                     for (u32 i = 0; i < CAP_GLYPHS; ++i) {
-                        Glyph* glyph = &arena->glyph_memory.glyphs[i];
-                        glyph->char_ =
+                        arena->glyph_memory.glyphs[i].char_ =
                             static_cast<u32>(arena->glyph_memory.chars[i]);
-                        glyph->position.x = i + 1;
-                        glyph->position.y = 1;
+                        arena->glyph_memory.glyphs[i].position.x = i + 1;
+                        arena->glyph_memory.glyphs[i].position.y = 1;
                     }
                     arena->glyph_memory.glyphs[CURSOR].char_ |= 0x100;
                 }
