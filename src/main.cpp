@@ -81,6 +81,8 @@ static void error_callback(i32 code, const char* error) {
     exit(EXIT_FAILURE);
 }
 
+#pragma GCC diagnostic pop
+
 static void key_callback(GLFWwindow* window,
                          i32         key,
                          i32         scancode,
@@ -104,8 +106,6 @@ static void key_callback(GLFWwindow* window,
         }
     }
 }
-
-#pragma GCC diagnostic pop
 
 i32 main() {
     printf("GLFW version  : %s\n"
