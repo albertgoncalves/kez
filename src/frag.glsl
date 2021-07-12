@@ -17,11 +17,11 @@ uniform sampler2D TEXTURE;
 layout(location = 0) out vec4 FRAG_OUT_COLOR;
 
 void main() {
-    uint char = (VERT_OUT_CHAR & 0xFFu) - 32u;
-    if (126u < char) {
-        char = 0u;
+    uint char_ = (VERT_OUT_CHAR & 0xFFu) - 32u;
+    if (126u < char_) {
+        char_ = 0u;
     }
-    vec2 index = uvec2(char % CELLS.x, char / CELLS.x) / vec2(PIXELS);
+    vec2 index = uvec2(char_ % CELLS.x, char_ / CELLS.x) / vec2(PIXELS);
     vec2 coord = vec2(VERT_OUT_POSITION.x, VERT_OUT_POSITION.y);
     vec3 color = vec3(gl_FragCoord.xy / RESOLUTION, 0.5);
     color *= (sin(TIME * 0.75) + 1.0) / 2.0;

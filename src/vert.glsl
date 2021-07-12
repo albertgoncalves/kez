@@ -3,7 +3,7 @@
 precision mediump float;
 
 layout(location = 0) in uvec2 index;
-layout(location = 1) in uint char;
+layout(location = 1) in uint char_;
 
 uniform vec2  RESOLUTION;
 uniform uvec2 PIXELS;
@@ -17,7 +17,7 @@ out vec2      VERT_OUT_POSITION;
 flat out uint VERT_OUT_CHAR;
 
 void main() {
-    VERT_OUT_CHAR = char;
+    VERT_OUT_CHAR = char_;
     vec2 coord = vec2(float(gl_VertexID & 1), float((gl_VertexID >> 1) & 1));
     VERT_OUT_POSITION = coord;
     coord = (coord * SCALE) + (index * SCALE);
