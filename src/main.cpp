@@ -81,6 +81,30 @@ static void error_callback(i32 code, const char* error) {
     exit(EXIT_FAILURE);
 }
 
+static void key_callback(GLFWwindow* window,
+                         i32         key,
+                         i32         scancode,
+                         i32         action,
+                         i32         mods) {
+    (void)scancode;
+    (void)mods;
+    if ((action == GLFW_PRESS) || (action == GLFW_REPEAT)) {
+        if (key == GLFW_KEY_ESCAPE) {
+            glfwSetWindowShouldClose(window, true);
+        }
+        if (key == GLFW_KEY_LEFT) {
+            if (0 < CURSOR) {
+                --CURSOR;
+            }
+        }
+        if (key == GLFW_KEY_RIGHT) {
+            if (CURSOR < (CAP_GLYPHS - 1)) {
+                ++CURSOR;
+            }
+        }
+    }
+}
+
 #pragma GCC diagnostic pop
 
 i32 main() {
@@ -96,7 +120,8 @@ i32 main() {
     glfwSetErrorCallback(error_callback);
     EXIT_IF(!glfwInit());
     GLFWwindow* window = init_get_window("float");
-    const u32   program = init_get_program(
+    glfwSetKeyCallback(window, key_callback);
+    const u32 program = init_get_program(
         &arena->buffer_memory,
         init_get_shader(&arena->buffer_memory, SHADER_VERT, GL_VERTEX_SHADER),
         init_get_shader(&arena->buffer_memory,
@@ -175,22 +200,7 @@ i32 main() {
         CHECK_GL_ERROR();
         while (!glfwWindowShouldClose(window)) {
             const f32 time_ = static_cast<f32>(glfwGetTime());
-            {
-                glfwPollEvents();
-                if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-                    glfwSetWindowShouldClose(window, true);
-                }
-                if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-                    if (0 < CURSOR) {
-                        --CURSOR;
-                    }
-                }
-                if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-                    if (CURSOR < (CAP_GLYPHS - 1)) {
-                        ++CURSOR;
-                    }
-                }
-            }
+            glfwPollEvents();
             {
                 {
                     Epoch epoch;
