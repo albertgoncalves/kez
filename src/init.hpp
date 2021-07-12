@@ -18,7 +18,7 @@ struct BufferMemory {
     char buffer[2 << 9];
 };
 
-#define INIT_WINDOW_WIDTH  ((1 << 10) + (1 << 9))
+#define INIT_WINDOW_WIDTH  ((1 << 10) + (1 << 9) + (1 << 8))
 #define INIT_WINDOW_HEIGHT ((1 << 8) + (1 << 6))
 
 static i32 WINDOW_WIDTH = INIT_WINDOW_WIDTH;

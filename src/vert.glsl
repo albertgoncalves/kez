@@ -10,7 +10,7 @@ uniform uvec2 PIXELS;
 uniform uvec2 CELLS;
 
 #define SIZE_CELL vec2(PIXELS / CELLS)
-#define K         20.0
+#define K         24.0
 #define SCALE     (SIZE_CELL * K)
 
 out vec2      VERT_OUT_POSITION;
