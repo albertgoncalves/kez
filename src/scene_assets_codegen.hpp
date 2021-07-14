@@ -1,5 +1,5 @@
-#ifndef __ASSETS_CODEGEN_H__
-#define __ASSETS_CODEGEN_H__
+#ifndef __SCENE_ASSETS_CODEGEN_H__
+#define __SCENE_ASSETS_CODEGEN_H__
 #include "prelude.hpp"
 #define PIXEL_WIDTH    128
 #define PIXEL_HEIGHT   64

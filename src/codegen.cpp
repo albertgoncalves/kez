@@ -42,8 +42,8 @@ i32 main(i32 n, const char** args) {
             }
         }
     }
-    printf("#ifndef __ASSETS_CODEGEN_H__\n"
-           "#define __ASSETS_CODEGEN_H__\n"
+    printf("#ifndef __SCENE_ASSETS_CODEGEN_H__\n"
+           "#define __SCENE_ASSETS_CODEGEN_H__\n"
            "#include \"prelude.hpp\"\n");
     {
         printf("#define PIXEL_WIDTH %d\n"
