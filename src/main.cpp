@@ -18,6 +18,7 @@ struct Uniform {
     i32 time;
     i32 pixels;
     i32 cells;
+    i32 texture;
 };
 
 struct Position {
@@ -161,8 +162,11 @@ i32 main() {
             }
             CHECK_GL_ERROR();
         }
+        // NOTE: Since we are syncing via the `glUniform1i` call below, we can
+        // use this arbitrary index value.
+        const i32 texture_index = 1;
         {
-            glActiveTexture(GL_TEXTURE0);
+            glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(texture_index));
             glGenTextures(1, &OBJECT.texture);
             glBindTexture(GL_TEXTURE_2D, OBJECT.texture);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -193,10 +197,13 @@ i32 main() {
             glGetUniformLocation(program, "TIME"),
             glGetUniformLocation(program, "PIXELS"),
             glGetUniformLocation(program, "CELLS"),
+            glGetUniformLocation(program, "TEXTURE"),
         };
+        CHECK_GL_ERROR();
         glUniform2ui(uniform.pixels, PIXEL_WIDTH, PIXEL_HEIGHT);
         // NOTE: Is there any way to avoid hard-coding this information?
         glUniform2ui(uniform.cells, 18, 7);
+        glUniform1i(uniform.texture, texture_index);
         CHECK_GL_ERROR();
         while (!glfwWindowShouldClose(window)) {
             const f32 time_ = static_cast<f32>(glfwGetTime());

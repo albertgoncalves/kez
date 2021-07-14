@@ -5,14 +5,13 @@ precision mediump float;
 in vec2      VERT_OUT_POSITION;
 flat in uint VERT_OUT_CHAR;
 
-uniform float TIME;
-uniform vec2  RESOLUTION;
-uniform uvec2 PIXELS;
-uniform uvec2 CELLS;
+uniform float     TIME;
+uniform vec2      RESOLUTION;
+uniform uvec2     PIXELS;
+uniform uvec2     CELLS;
+uniform sampler2D TEXTURE;
 
 #define SIZE_CELL vec2(PIXELS / CELLS)
-
-uniform sampler2D TEXTURE;
 
 layout(location = 0) out vec4 FRAG_OUT_COLOR;
 
