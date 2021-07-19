@@ -15,3 +15,4 @@
 !*.hpp
 !*.cpp
 !*.glsl
+*_codegen.hpp
