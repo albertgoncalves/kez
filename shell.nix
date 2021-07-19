@@ -1,24 +1,21 @@
 with import <nixpkgs> {};
 mkShell.override { stdenv = llvmPackages_12.stdenv; } {
     buildInputs = [
-        cmake
-        doxygen
         feh
+        glfw
         libGL
-        pkg-config
         python3
         python3Packages.flake8
         renderdoc
         shellcheck
         valgrind
-        xorg.libX11
-        xorg.libXcursor
-        xorg.libXext
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXrandr
+    ];
+    APPEND_LIBRARY_PATH = lib.makeLibraryPath [
+        glfw
+        libGL
     ];
     shellHook = ''
+        export LD_LIBRARY_PATH="$APPEND_LIBRARY_PATH:$LD_LIBRARY_PATH"
         . .shellhook
     '';
 }
