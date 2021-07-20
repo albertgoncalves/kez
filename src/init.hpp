@@ -6,7 +6,6 @@
 #define GL_GLEXT_PROTOTYPES
 
 #pragma GCC diagnostic push
-
 #pragma GCC diagnostic ignored "-Wdocumentation"
 #pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
 
@@ -15,38 +14,19 @@
 #pragma GCC diagnostic pop
 
 struct BufferMemory {
-    char buffer[2 << 9];
+    char buffer[1 << 10];
 };
 
-#define INIT_WINDOW_WIDTH  ((1 << 10) + (1 << 9) + (1 << 8))
-#define INIT_WINDOW_HEIGHT ((1 << 8) + (1 << 6))
-
-static i32 WINDOW_WIDTH = INIT_WINDOW_WIDTH;
-static i32 WINDOW_HEIGHT = INIT_WINDOW_HEIGHT;
-
-static void init_framebuffer_size_callback(GLFWwindow* window,
-                                           i32         width,
-                                           i32         height) {
-    (void)window;
-    WINDOW_WIDTH = width;
-    WINDOW_HEIGHT = height;
-}
-
-static GLFWwindow* init_get_window(const char* name) {
+static GLFWwindow* init_get_window(const char* name, i32 width, i32 height) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow* window = glfwCreateWindow(INIT_WINDOW_WIDTH,
-                                          INIT_WINDOW_HEIGHT,
-                                          name,
-                                          null,
-                                          null);
+    GLFWwindow* window = glfwCreateWindow(width, height, name, null, null);
     if (!window) {
         glfwTerminate();
         ERROR("!window");
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, init_framebuffer_size_callback);
     glfwSwapInterval(1);
     return window;
 }

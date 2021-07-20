@@ -9,7 +9,6 @@
 #define STBI_ONLY_PNG
 
 #pragma GCC diagnostic push
-
 #pragma GCC diagnostic ignored "-Wcast-align"
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #pragma GCC diagnostic ignored "-Wdouble-promotion"

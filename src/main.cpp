@@ -7,6 +7,9 @@
 #define CAP_CHARS  20
 #define CAP_GLYPHS (CAP_CHARS - 1)
 
+static i32 WINDOW_WIDTH = (1 << 10) + (1 << 9) + (1 << 8);
+static i32 WINDOW_HEIGHT = (1 << 8) + (1 << 6);
+
 struct Object {
     u32 vertex_array;
     u32 vertex_buffer;
@@ -74,7 +77,6 @@ static u32 CURSOR;
     }
 
 #pragma GCC diagnostic push
-
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
 
 static void error_callback(i32 code, const char* error) {
@@ -108,6 +110,14 @@ static void key_callback(GLFWwindow* window,
     }
 }
 
+static void framebuffer_size_callback(GLFWwindow* window,
+                                      i32         width,
+                                      i32         height) {
+    (void)window;
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+}
+
 i32 main() {
     printf("GLFW version  : %s\n"
            "sizeof(Glyph) : %zu\n"
@@ -120,7 +130,8 @@ i32 main() {
     EXIT_IF(!arena);
     glfwSetErrorCallback(error_callback);
     EXIT_IF(!glfwInit());
-    GLFWwindow* window = init_get_window("float");
+    GLFWwindow* window = init_get_window("float", WINDOW_WIDTH, WINDOW_HEIGHT);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
     const u32 program = init_get_program(
         &arena->buffer_memory,
