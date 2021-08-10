@@ -5,13 +5,7 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdocumentation"
-#pragma GCC diagnostic ignored "-Wdocumentation-unknown-command"
-
 #include <GLFW/glfw3.h>
-
-#pragma GCC diagnostic pop
 
 struct BufferMemory {
     char buffer[1 << 10];
