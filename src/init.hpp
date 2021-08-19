@@ -18,7 +18,7 @@ static GLFWwindow* init_get_window(const char* name, i32 width, i32 height) {
     GLFWwindow* window = glfwCreateWindow(width, height, name, null, null);
     if (!window) {
         glfwTerminate();
-        ERROR("!window");
+        EXIT_WITH("!window");
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
@@ -38,7 +38,7 @@ static u32 init_get_shader(BufferMemory* memory,
                            sizeof(memory->buffer),
                            null,
                            memory->buffer);
-        ERROR(memory->buffer);
+        EXIT_WITH(memory->buffer);
     }
     return shader;
 }
@@ -57,7 +57,7 @@ static u32 init_get_program(BufferMemory* memory,
                             sizeof(memory->buffer),
                             null,
                             memory->buffer);
-        ERROR(memory->buffer);
+        EXIT_WITH(memory->buffer);
     }
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
