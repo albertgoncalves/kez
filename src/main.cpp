@@ -2,7 +2,7 @@
 #include "init_assets_codegen.hpp"
 #include "scene_assets_codegen.hpp"
 
-#include <unistd.h>
+#include <string.h>
 
 #define CAP_CHARS  20
 #define CAP_GLYPHS (CAP_CHARS - 1)
@@ -81,7 +81,7 @@ static u32 CURSOR;
 
 static void error_callback(i32 code, const char* error) {
     fprintf(stderr, "%d: %s\n", code, error);
-    exit(EXIT_FAILURE);
+    _exit(EXIT_FAILURE);
 }
 
 #pragma GCC diagnostic pop
@@ -118,6 +118,13 @@ static void framebuffer_size_callback(GLFWwindow* window,
     WINDOW_HEIGHT = height;
 }
 
+static void* alloc(usize size) {
+    void* memory = sbrk(static_cast<isize>(size));
+    EXIT_IF(memory == reinterpret_cast<void*>(-1));
+    memset(memory, 0, size);
+    return memory;
+}
+
 i32 main() {
     printf("GLFW version  : %s\n"
            "sizeof(Glyph) : %zu\n"
@@ -126,8 +133,7 @@ i32 main() {
            glfwGetVersionString(),
            sizeof(Glyph),
            sizeof(Arena));
-    Arena* arena = reinterpret_cast<Arena*>(calloc(1, sizeof(Arena)));
-    EXIT_IF(!arena);
+    Arena* arena = reinterpret_cast<Arena*>(alloc(sizeof(Arena)));
     glfwSetErrorCallback(error_callback);
     EXIT_IF(!glfwInit());
     GLFWwindow* window = init_get_window("float", WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -275,6 +281,5 @@ i32 main() {
         CHECK_GL_ERROR();
     }
     glfwTerminate();
-    free(arena);
     return EXIT_SUCCESS;
 }
