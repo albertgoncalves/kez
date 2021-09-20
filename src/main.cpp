@@ -2,7 +2,7 @@
 #include "init_assets_codegen.hpp"
 #include "scene_assets_codegen.hpp"
 
-#include <string.h>
+#include <sys/mman.h>
 
 #define CAP_CHARS  20
 #define CAP_GLYPHS (CAP_CHARS - 1)
@@ -119,9 +119,13 @@ static void framebuffer_size_callback(GLFWwindow* window,
 }
 
 static void* alloc(usize size) {
-    void* memory = sbrk(static_cast<isize>(size));
-    EXIT_IF(memory == reinterpret_cast<void*>(-1));
-    memset(memory, 0, size);
+    void* memory = mmap(null,
+                        size,
+                        PROT_READ | PROT_WRITE,
+                        MAP_ANONYMOUS | MAP_PRIVATE,
+                        -1,
+                        0);
+    EXIT_IF(memory == MAP_FAILED);
     return memory;
 }
 
