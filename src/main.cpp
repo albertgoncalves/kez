@@ -76,15 +76,10 @@ static u32 CURSOR;
         }                                                  \
     }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-noreturn"
-
-static void error_callback(i32 code, const char* error) {
+[[noreturn]] static void error_callback(i32 code, const char* error) {
     fprintf(stderr, "%d: %s\n", code, error);
     _exit(EXIT_FAILURE);
 }
-
-#pragma GCC diagnostic pop
 
 static void key_callback(GLFWwindow* window,
                          i32         key,
