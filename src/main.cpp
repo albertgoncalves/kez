@@ -81,13 +81,7 @@ static u32 CURSOR;
     _exit(EXIT_FAILURE);
 }
 
-static void key_callback(GLFWwindow* window,
-                         i32         key,
-                         i32         scancode,
-                         i32         action,
-                         i32         mods) {
-    (void)scancode;
-    (void)mods;
+static void key_callback(GLFWwindow* window, i32 key, i32, i32 action, i32) {
     if ((action == GLFW_PRESS) || (action == GLFW_REPEAT)) {
         if (key == GLFW_KEY_ESCAPE) {
             glfwSetWindowShouldClose(window, true);
@@ -105,10 +99,7 @@ static void key_callback(GLFWwindow* window,
     }
 }
 
-static void framebuffer_size_callback(GLFWwindow* window,
-                                      i32         width,
-                                      i32         height) {
-    (void)window;
+static void framebuffer_size_callback(GLFWwindow*, i32 width, i32 height) {
     WINDOW_WIDTH = width;
     WINDOW_HEIGHT = height;
 }
