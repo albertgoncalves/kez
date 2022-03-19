@@ -35,14 +35,15 @@ now () {
 (
     start=$(now)
     if [ ! -f "$WD/src/scene_assets_codegen.hpp" ]; then
-        clang++ "-I$WD/stb" "${flags[@]}" -o "$WD/bin/codegen" \
+        mold -run clang++ "-I$WD/stb" "${flags[@]}" -o "$WD/bin/codegen" \
             "$WD/src/codegen.cpp"
         "$WD/bin/codegen" "$WD/assets/charmap-futuristic_black.png" \
             > "$WD/src/scene_assets_codegen.hpp"
     fi
     "$WD/scripts/codegen.py" > "$WD/src/init_assets_codegen.hpp"
     clang-format -i -verbose "$WD/src"/*
-    clang++ "${libs[@]}" "${flags[@]}" -o "$WD/bin/main" "$WD/src/main.cpp"
+    mold -run clang++ "${libs[@]}" "${flags[@]}" -o "$WD/bin/main" \
+        "$WD/src/main.cpp"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\n\".format($end - $start))"
 )

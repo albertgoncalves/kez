@@ -4,6 +4,7 @@ mkShell.override { stdenv = llvmPackages_12.stdenv; } {
         feh
         glfw
         libGL
+        mold
         python3
         python3Packages.flake8
         renderdoc
